@@ -392,9 +392,9 @@ impl VenueAdapter for CryptoRestAdapter {
         if let Ok(v) = serde_json::from_slice::<serde_json::Value>(frame) {
             let inst = v.get("i").and_then(|x| x.as_u64()).unwrap_or(0) as u32;
             let get_pair = |k: &str| -> Option<(i128, u64)> {
-                let px = v.get(&format!("{k}_px")).and_then(|x| x.as_i64())?;
+                let px = v.get(format!("{k}_px")).and_then(|x| x.as_i64())?;
                 let qty = v
-                    .get(&format!("{k}_qty"))
+                    .get(format!("{k}_qty"))
                     .and_then(|x| x.as_u64())
                     .unwrap_or(0);
                 Some((px as i128, qty))
@@ -503,7 +503,7 @@ impl IvSurface {
                 .collect()
         };
         // Bracket by strike.
-        let below = band.iter().filter(|p| p.strike_raw <= strike_raw).last();
+        let below = band.iter().rfind(|p| p.strike_raw <= strike_raw);
         let above = band.iter().find(|p| p.strike_raw >= strike_raw);
         match (below, above) {
             (Some(b), Some(a)) => {
