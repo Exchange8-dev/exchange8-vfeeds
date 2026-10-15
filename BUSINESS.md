@@ -1,7 +1,7 @@
-# BUSINESS.md: Ex8:VFeeds — Business Requirements & Functionality
+# BUSINESS.md: Exchange8:VFeeds — Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
-> Ex8:VFeeds **does for the business**. For architecture read `README.md`;
+> Exchange8:VFeeds **does for the business**. For architecture read `README.md`;
 > for wire-level detail read `DESIGN.md`.
 
 ## 1. Business Purpose
@@ -42,12 +42,12 @@
 
 | Concern | Owner |
 |---|---|
-| Publishing market data to client-facing channels | Ex8:MD |
-| Choosing where to route orders using per-venue quotes | Ex8:SOR |
-| Order lifecycle and use of the external best quote in order handling | Ex8:OMS |
-| Margin, funding rates, and Greeks pricing that consume the index and IV surface | Ex8:Margin |
-| The security master referenced by constituents and summaries | Ex8:RefData |
-| Payment/funds movement arising from index-linked obligations | Ex8:Settlement |
+| Publishing market data to client-facing channels | Exchange8:MD |
+| Choosing where to route orders using per-venue quotes | Exchange8:SOR |
+| Order lifecycle and use of the external best quote in order handling | Exchange8:OMS |
+| Margin, funding rates, and Greeks pricing that consume the index and IV surface | Exchange8:Margin |
+| The security master referenced by constituents and summaries | Exchange8:RefData |
+| Payment/funds movement arising from index-linked obligations | Exchange8:Settlement |
 | Where published events are stored and how streams are distributed | Sentin8:Bus |
 | Who may do what (authorization decisions, role resolution) | Shield (Sentin8:Policy) with Sentin8:Auth |
 | Long-run audit archive and decision history | Sentin8:Sys |
@@ -173,7 +173,7 @@ service's authorization surface) via the platform consumption path.
 | Sentin8:Bus | Durable publication of market events; consumption paths for consumers |
 | Sentin8:Sys | Audit ingestion; hostname resolution for database-free TLS host-context |
 | Sentin8:Secrets | Resolving feed credential references |
-| Ex8:RefData | The security master referenced by constituents and summaries (declared read-only cross-schema access) |
+| Exchange8:RefData | The security master referenced by constituents and summaries (declared read-only cross-schema access) |
 | Venues' recovery endpoints | Retransmission ranges when the backup leg cannot fill a gap |
 | Platform shell (sentin8::shell) | Boot order, DB pool, health, middleware, outbox relay, audit pusher, TLS termination |
 

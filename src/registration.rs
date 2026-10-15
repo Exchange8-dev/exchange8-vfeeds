@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Service self-registration data for Ex8:VFEEDS (generated; hand-tune freely).
+//! Service self-registration data for Exchange8:VFEEDS (generated; hand-tune freely).
 //!
 //! Output via `--print-registration` (see the platform
 //! `sentin8-service-self-registration-design.md`).

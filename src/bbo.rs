@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:VFeeds BBO engine — per-instrument consolidated best bid/offer
+//! Exchange8:VFeeds BBO engine — per-instrument consolidated best bid/offer
 //! with strictly non-empty venue-quote selection.
 //!
 //! Per-instrument `VenueQuotes[venue_index]`; CBBO bid = max **non-zero** bid,

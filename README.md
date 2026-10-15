@@ -1,12 +1,12 @@
-# README.md: Ex8:VFeeds — External Venue Feeds, Consolidated BBO, Index Engine
+# README.md: Exchange8:VFeeds — External Venue Feeds, Consolidated BBO, Index Engine
 
-> Overview — what Ex8:VFeeds is, why it exists, and how it fits the exchange8
+> Overview — what Exchange8:VFeeds is, why it exists, and how it fits the exchange8
 > platform. Wire-level detail lives in `DESIGN.md`; business functionality in
 > `BUSINESS.md`.
 
 ## 1. Summary
 
-Ex8:VFeeds is the exchange8 **external venue edge**. It connects to upstream
+Exchange8:VFeeds is the exchange8 **external venue edge**. It connects to upstream
 trading venues and market-data providers, normalizes every vendor transport
 and payload into a single internal quote-event model, recovers message loss with
 dual-feed (A/B) sequence handling, and maintains the per-instrument **consolidated
@@ -44,7 +44,7 @@ exchange8 service holds a venue connection.
 The service is a Rust axum binary mounted on the shared Sentin8 Shell
 (`sentin8::shell`): the shell owns boot order, the DB pool, `/v1/health`, the
 Shield (Sentin8:Policy) admin API, middleware, and PQ-TLS termination.
-Ex8:VFeeds contributes one pure core and a thin shell extension:
+Exchange8:VFeeds contributes one pure core and a thin shell extension:
 
 - **Adapter framework** (`adapters.rs`): a compile-time registry of pure
   parsers — bytes in, `VenueQuoteEvent` out. Transports span dual-leg
@@ -103,9 +103,9 @@ graph TD
 ```
 
 Consumers of the normalized events and the CBBO/index outputs are the
-downstream exchange8 services: Ex8:MD (re-publication), Ex8:SOR (per-venue
-quotes), Ex8:OMS (external best bid/offer), Ex8:Margin (mark-to-market and
-funding) and Ex8:Settlement (index value history).
+downstream exchange8 services: Exchange8:MD (re-publication), Exchange8:SOR (per-venue
+quotes), Exchange8:OMS (external best bid/offer), Exchange8:Margin (mark-to-market and
+funding) and Exchange8:Settlement (index value history).
 
 ## 4. Key Traits and Data Structures
 

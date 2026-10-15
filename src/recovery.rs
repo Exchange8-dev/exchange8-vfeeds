@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:VFeeds dual-feed A/B sequence gap recovery.
+//! Exchange8:VFeeds dual-feed A/B sequence gap recovery.
 //!
 //! Implements venue-feeds design §4.1: dual-feed (A/B) consumption with
 //! sequence-gap recovery. A is the primary stream; B is the backup. When A

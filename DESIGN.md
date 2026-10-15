@@ -1,4 +1,4 @@
-# DESIGN.md: Ex8:VFeeds — Detailed Design Document
+# DESIGN.md: Exchange8:VFeeds — Detailed Design Document
 
 > Wire-level construction of the external venue feeds service. For the
 > overview read `README.md`; for business functionality read `BUSINESS.md`.
@@ -24,11 +24,11 @@
 
 | Concern | Owner |
 |---|---|
-| Publication of market data to consumers | Ex8:MD (`services/md`) |
-| Routing decisions from per-venue quotes | Ex8:SOR (`services/sor`) |
-| Order states, external best-bid/offer use | Ex8:OMS (`services/oms`) |
-| Mark-to-market, funding, Greeks pricing | Ex8:Margin (`services/margin`) |
-| Security master (`refdata.security`) | Ex8:RefData (`services/refdata`) |
+| Publication of market data to consumers | Exchange8:MD (`services/md`) |
+| Routing decisions from per-venue quotes | Exchange8:SOR (`services/sor`) |
+| Order states, external best-bid/offer use | Exchange8:OMS (`services/oms`) |
+| Mark-to-market, funding, Greeks pricing | Exchange8:Margin (`services/margin`) |
+| Security master (`refdata.security`) | Exchange8:RefData (`services/refdata`) |
 | Event storage + stream distribution | Sentin8:Bus |
 | Token issuance / JWKS | Sentin8:Auth |
 | Audit aggregation and decisions store | Sentin8:Sys, Sentin8:Policy |
@@ -180,7 +180,7 @@ sequenceDiagram
     end
 ```
 
-### Request family — tick / BBO fan-out to Ex8:MD
+### Request family — tick / BBO fan-out to Exchange8:MD
 
 ```mermaid
 sequenceDiagram
@@ -189,7 +189,7 @@ sequenceDiagram
     participant PG as Postgres (db exchange8)
     participant R as Shell outbox relay
     participant BUS as Sentin8:Bus
-    participant MD as Ex8:MD (direct consumer)
+    participant MD as Exchange8:MD (direct consumer)
 
     BBO-->>W: QuoteUpdate::Changed(Bbo)
     W->>PG: BEGIN; domain row + INSERT vfeeds.outbox (event_type, payload, idempotency_key = row id); COMMIT
@@ -208,7 +208,7 @@ sequenceDiagram
     participant IDX as IndexEngine
     participant VAL as vfeeds.index / index_constituent (Postgres)
     participant W as Domain writer
-    participant MGN as Ex8:Margin (event consumer)
+    participant MGN as Exchange8:Margin (event consumer)
 
     W->>VAL: load index definition (method, divisor) + constituents (weights)
     W->>IDX: compute(ConstituentTick[..])
@@ -390,7 +390,7 @@ Bus; `idempotency_key` = outbox row id)
 | `exchange8:vfeeds:feed:status` | Feed up/down/degraded, sequence gaps |
 | `exchange8:vfeeds:index:updated` | Index recompute published |
 
-Multi-party flow (external venue → vfeeds → Ex8:MD):
+Multi-party flow (external venue → vfeeds → Exchange8:MD):
 
 ```mermaid
 sequenceDiagram
@@ -406,7 +406,7 @@ sequenceDiagram
     OB-->>BUS: relay: POST /v1/produce (M2M, sentin8:bus:produce)
     BUS->>BUS: persist inbox → XADD bus:{env}:{family}
     MD->>BUS: consume (direct consumer, sentin8:bus:consume) + POST /v1/ack
-    Note over MD: re-publication to clients is Ex8:MD's responsibility
+    Note over MD: re-publication to clients is Exchange8:MD's responsibility
 ```
 
 Event-flow (outbox → Bus → trigger):

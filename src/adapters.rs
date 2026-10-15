@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:VFeeds adapter framework + remaining venue adapters + crypto
+//! Exchange8:VFeeds adapter framework + remaining venue adapters + crypto
 //! REST/WS feeds + IV surface + index feed.
 //!
 //! - **Adapter framework**: the `VenueAdapter` trait, transport enum,

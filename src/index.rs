@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:VFeeds index engine — constituent aggregation + divisor continuity.
+//! Exchange8:VFeeds index engine — constituent aggregation + divisor continuity.
 //!
 //! Methods: median / volume-weighted / time-weighted, with outlier rejection
 //! (drop constituents deviating > N% from the median). The divisor maintains
