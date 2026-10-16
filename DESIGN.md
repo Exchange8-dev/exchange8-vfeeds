@@ -192,12 +192,12 @@ sequenceDiagram
     participant MD as Exchange8:MD (direct consumer)
 
     BBO-->>W: QuoteUpdate::Changed(Bbo)
-    W->>PG: BEGIN; domain row + INSERT vfeeds.outbox (event_type, payload, idempotency_key = row id); COMMIT
+    W->>PG: BEGIN, domain row + INSERT vfeeds.outbox (event_type, payload, idempotency_key = row id), COMMIT
     PG-->>R: pg_notify('vfeeds_outbox_changed')
     R->>BUS: POST /v1/produce (M2M token, scope sentin8:bus:produce)
     BUS-->>MD: bus:{env}:{family} stream entry
     MD->>BUS: consume + POST /v1/ack (bus-client)
-    Note over W,BUS: Relay fail-open: Bus outage leaves rows relayed=false; 5 s poll retries
+    Note over BBO,MD: Relay fail-open: Bus outage leaves rows relayed=false, 5 s poll retries
 ```
 
 ### Request family — index computation
@@ -429,7 +429,7 @@ sequenceDiagram
         BUS-->>R: unavailable (fail-open)
         R->>OB: relay_attempts += 1, row stays unrelayed, retried
     else consumer-side failure
-        BUS->>C: redelivery until ACK; DLQ after retries (Bus-owned)
+        BUS->>C: redelivery until ACK, DLQ after retries (Bus-owned)
     end
 ```
 
@@ -522,7 +522,7 @@ sequenceDiagram
     else recovery fails
         T-->>Q: venue quotes reset (affected venue only)
         Q-->>E: feed:status degraded + bbo recomputed without the venue
-        Note over E: consumers act on staleness policy; other venues unaffected
+    Note over F,E: consumers act on staleness policy, other venues unaffected
     end
 ```
 
