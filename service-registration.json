@@ -2,7 +2,11 @@
   "vertical": "exchange8",
   "services": [
     {
-      "service_type": "exchange8:vfeeds"
+      "service_type": "exchange8:vfeeds",
+      "telemetry_property": {
+        "slug": "vfeeds",
+        "name": "Exchange8:Vfeeds Telemetry"
+      }
     }
   ]
 }
