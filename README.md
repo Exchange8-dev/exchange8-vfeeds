@@ -1,6 +1,6 @@
-# README.md: Exchange8:VFeeds — External Venue Feeds, Consolidated BBO, Index Engine
+# README.md: Exchange8:VFeeds - External Venue Feeds, Consolidated BBO, Index Engine
 
-> Overview — what Exchange8:VFeeds is, why it exists, and how it fits the exchange8
+> Overview - what Exchange8:VFeeds is, why it exists, and how it fits the exchange8
 > platform. Wire-level detail lives in `DESIGN.md`; business functionality in
 > `BUSINESS.md`.
 
@@ -11,8 +11,8 @@ trading venues and market-data providers, normalizes every vendor transport
 and payload into a single internal quote-event model, recovers message loss with
 dual-feed (A/B) sequence handling, and maintains the per-instrument **consolidated
 best bid/offer (CBBO)** across all configured venues. The same service owns the
-**index engine** — constituent weighting, outlier rejection, and divisor
-continuity across rebalancing — whose values price margins and fund perpetuals,
+**index engine** - constituent weighting, outlier rejection, and divisor
+continuity across rebalancing - whose values price margins and fund perpetuals,
 plus the previous-day close summary and lot policy the gateways need. It is the
 exclusive source of external market state inside the vertical: no other
 exchange8 service holds a venue connection.
@@ -21,8 +21,8 @@ exchange8 service holds a venue connection.
 
 - **One quote model, N vendors.** Every venue speaks a different transport and
   payload (multicast stamps, binary packets, SOUP/ITCH frames, TL1 text, REST
-  snapshots, WebSocket deltas). Downstream consumers — smart order routing,
-  order management, market-data publication — need one normalized event, not N
+  snapshots, WebSocket deltas). Downstream consumers - smart order routing,
+  order management, market-data publication - need one normalized event, not N
   parsers of their own.
 - **A crossed consolidated book is an incident, not a quirk.** CBBO is
   high-frequency, correctness-critical state. Empty venues must never win a
@@ -35,7 +35,7 @@ exchange8 service holds a venue connection.
   and fund against a robust index value computed from constituents, with
   outlier protection and continuity across constituent changes.
 - **Feed configuration is tenant data.** Which venues, which transports, which
-  credentials, whether a feed is enabled — these are env-scoped rows with the
+  credentials, whether a feed is enabled - these are env-scoped rows with the
   same RLS isolation as every other exchange8 table; credentials are stored as
   secret references, never plaintext.
 
@@ -47,10 +47,10 @@ Shield (Sentin8:Policy) admin API, middleware, and PQ-TLS termination.
 Exchange8:VFeeds contributes one pure core and a thin shell extension:
 
 - **Adapter framework** (`adapters.rs`): a compile-time registry of pure
-  parsers — bytes in, `VenueQuoteEvent` out. Transports span dual-leg
+  parsers - bytes in, `VenueQuoteEvent` out. Transports span dual-leg
   multicast, SoupBinTCP, plain TCP (TL1), UDP2IP datagrams, crypto REST
   and WebSocket frames.
-- **A/B sequencer** (`recovery.rs`): per-session ordering on the dual legs —
+- **A/B sequencer** (`recovery.rs`): per-session ordering on the dual legs -
   in-order delivery, stale-drop dedup, bounded gap buffering, B-fill wait,
   then retransmission requests to the venue recovery endpoint.
 - **CBBO engine** (`bbo.rs`): per-instrument consolidated top of book with
@@ -64,24 +64,24 @@ Exchange8:VFeeds contributes one pure core and a thin shell extension:
 
 ```mermaid
 graph TD
-    subgraph VENUES["External venues — untrusted edge network"]
-        TSX["TSX / TSXV — STAMP CBBO and eXMT/Quantum L1"]
-        CHIX["Chi-X — ITCH over Mold / SOUP frames"]
-        AEQ["Aequitas — UDP2IP frames"]
-        CSE["CSE — TL1 text lines"]
-        CRYPTO["Crypto venues — REST snapshots + WebSocket deltas"]
+    subgraph VENUES["External venues - untrusted edge network"]
+        TSX["TSX / TSXV - STAMP CBBO and eXMT/Quantum L1"]
+        CHIX["Chi-X - ITCH over Mold / SOUP frames"]
+        AEQ["Aequitas - UDP2IP frames"]
+        CSE["CSE - TL1 text lines"]
+        CRYPTO["Crypto venues - REST snapshots + WebSocket deltas"]
     end
 
-    subgraph PROC["exchange8-vfeeds — PQ-TLS terminated in-process"]
-        SESS["Feed session — transport frames + heartbeat"]
-        SEQ["AbSequencer — A/B ordering + gap recovery"]
-        ADPT["VenueAdapter parsers — pure, per payload kind"]
-        BBOENG["BboEngine — CBBO state + cross alerts"]
-        IVS["IvSurface — implied-vol interpolation"]
-        IDXENG["IndexEngine — constituents to index value"]
-        OUTBOX["vfeeds.outbox — same-tx rows + pg_notify"]
+    subgraph PROC["exchange8-vfeeds - PQ-TLS terminated in-process"]
+        SESS["Feed session - transport frames + heartbeat"]
+        SEQ["AbSequencer - A/B ordering + gap recovery"]
+        ADPT["VenueAdapter parsers - pure, per payload kind"]
+        BBOENG["BboEngine - CBBO state + cross alerts"]
+        IVS["IvSurface - implied-vol interpolation"]
+        IDXENG["IndexEngine - constituents to index value"]
+        OUTBOX["vfeeds.outbox - same-tx rows + pg_notify"]
         JOURNAL["vfeeds.audit_journal"]
-        POLICY["Shield — scope-mirror engine + admin API"]
+        POLICY["Shield - scope-mirror engine + admin API"]
         HEALTH["GET /v1/health + active_connections gauge"]
     end
 
@@ -111,37 +111,37 @@ funding) and Exchange8:Settlement (index value history).
 
 Concepts as implemented; signatures live in the source and `DESIGN.md`.
 
-- **`VenueAdapter` contract** — the pluggable parser boundary: an adapter
+- **`VenueAdapter` contract** - the pluggable parser boundary: an adapter
   exposes a registry name, the payload kinds it produces, its configured
   transport, and a frame parser that turns bytes into normalized events.
   Adapters are pure and stateless; sockets, heartbeats, and supervision are the
   session task's job. New venue support is a new adapter implementation plus a
-  `vfeeds.external_feed` row — no downstream changes.
-- **`Transport` vocabulary** — the enum of connectable transports: dual-leg
+  `vfeeds.external_feed` row - no downstream changes.
+- **`Transport` vocabulary** - the enum of connectable transports: dual-leg
   multicast (A/B), single multicast, SoupBinTCP, plain TCP, UDP2IP, crypto
   REST poller, crypto WebSocket.
-- **`VenueQuoteEvent`** — the single normalized quote model: instrument,
+- **`VenueQuoteEvent`** - the single normalized quote model: instrument,
   four-byte venue MIC, venue timestamp and receive timestamp (dual clocks),
   quote kind (best / depth / order book / status), optional bid, ask, depth
   levels, lot size, and venue sequence. Consumers build whatever they need on
   top of it.
-- **`BboEngine`** — per-instrument CBBO state machine. Venue quotes are stored
+- **`BboEngine`** - per-instrument CBBO state machine. Venue quotes are stored
   as `Option`s (`None` = no quote), the consolidated best scans strictly
   non-empty sides, changes collapse to an `Unchanged/Changed/CrossZeroed`
   outcome, and the cross path zeroes both sides and bumps the cross-alert
   counter. `ClearSide` (bid / ask / both) is the stale-quote clear vocabulary
   of the admin surface.
-- **`IndexEngine`** — method (median, volume-weighted, time-weighted), an
+- **`IndexEngine`** - method (median, volume-weighted, time-weighted), an
   outlier tolerance in basis points from the median, a divisor, and the
   rebalance rule that keeps the published value continuous when the
   constituent set changes.
-- **`IvSurface` / `IvPoint`** — per-instrument implied-volatility points
+- **`IvSurface` / `IvPoint`** - per-instrument implied-volatility points
   (strike, expiry, IV in bps) with nearest-expiry banding and linear strike
   interpolation; the pricing input for Greeks.
-- **`AbSequencer`** — the A/B recovery core: monotonic next-expected sequence,
+- **`AbSequencer`** - the A/B recovery core: monotonic next-expected sequence,
   ordered buffer (`BTreeMap`), stale-drop dedup, bounded buffer with forced
   retransmission, and explicit retransmission request windows.
-- **Persistence shapes** — `vfeeds.external_feed` (+ `params` JSONB and the
+- **Persistence shapes** - `vfeeds.external_feed` (+ `params` JSONB and the
   secret reference column), `vfeeds.external_retrans_feed` (per-feed recovery
   endpoints), `vfeeds.previous_day_summary` (close price, volume, lot
   policy), `vfeeds.index` / `vfeeds.index_constituent` / `vfeeds.index_value`,
@@ -200,7 +200,7 @@ Concepts as implemented; signatures live in the source and `DESIGN.md`.
   `exchange8_vfeeds_service` (no `BYPASSRLS`), granted only on schema `vfeeds`
   plus the declared read-only cross-schema grant `SELECT` on
   `refdata.security`.
-- **The relay and journal pusher are fail-open loops** — a Sentin8:Bus or
+- **The relay and journal pusher are fail-open loops** - a Sentin8:Bus or
   Sentin8:Sys outage delays delivery but never drops rows; both workers poll on
   a short safety timer in addition to their notify/push triggers.
 

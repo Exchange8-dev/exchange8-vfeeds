@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:VFeeds BBO engine — per-instrument consolidated best bid/offer
+//! Exchange8:VFeeds BBO engine - per-instrument consolidated best bid/offer
 //! with strictly non-empty venue-quote selection.
 //!
 //! Per-instrument `VenueQuotes[venue_index]`; CBBO bid = max **non-zero** bid,
@@ -167,7 +167,7 @@ impl BboEngine {
 }
 
 /// Which side(s) to clear. Part of the admin API surface (
-/// `ClearQuote` accepted side: bid|ask|both) — `Ask` is reachable through
+/// `ClearQuote` accepted side: bid|ask|both) - `Ask` is reachable through
 /// `POST /v1/admin/quotes/clear` even though the unit tests only cover bid/both.
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

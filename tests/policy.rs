@@ -68,7 +68,7 @@ fn mirror_engine(mode: PolicyMode) -> PolicyEngine {
 }
 
 /// (a) no-set → deny: an engine with NO loaded set denies everything
-/// (fail-closed, design §3.3) — the runtime bridge converts it to 403.
+/// (fail-closed, design §3.3) - the runtime bridge converts it to 403.
 #[test]
 fn no_set_denies_everything() {
     let e = PolicyEngine::new(SERVICE); // empty cache
@@ -119,7 +119,7 @@ fn mirror_permits_own_grants() {
     }
 }
 
-/// (d) M2M parity: `token_tp == "m2m"` evaluates the same set — the token
+/// (d) M2M parity: `token_tp == "m2m"` evaluates the same set - the token
 /// type never bypasses policy (principles §5.2a).
 #[test]
 fn m2m_parity() {
@@ -203,7 +203,7 @@ fn role_keyed_tenant_set_decides() {
 }
 
 /// (g) tenant isolation: sets of ANOTHER env are invisible to this env's
-/// evaluation — the cache key is (env_id, name).
+/// evaluation - the cache key is (env_id, name).
 #[test]
 fn cross_env_set_isolated() {
     let other_env = uuid::Uuid::new_v4();
@@ -227,7 +227,7 @@ fn cross_env_set_isolated() {
 }
 
 /// (g2) registration parity: the declared set covers EVERY action the
-/// handlers evaluate — a new EvalTarget without a mirror permit fails here.
+/// handlers evaluate - a new EvalTarget without a mirror permit fails here.
 #[test]
 fn declared_mirror_covers_every_handler_action() {
     let e = mirror_engine(PolicyMode::Enforced);
@@ -240,7 +240,7 @@ fn declared_mirror_covers_every_handler_action() {
     }
 }
 
-/// (h) the enroll-time dry-run gate (§4.2) accepts the declared set —
+/// (h) the enroll-time dry-run gate (§4.2) accepts the declared set -
 /// an enforced set that denies its own grants never ships.
 #[test]
 fn declared_set_passes_enroll_dry_run() {
@@ -249,5 +249,5 @@ fn declared_set_passes_enroll_dry_run() {
 }
 
 /// Every action the VFEEDS handlers evaluate (step-5 targets). The
-/// mirror set must cover each one — see `declared_mirror_covers_every_handler_action`.
+/// mirror set must cover each one - see `declared_mirror_covers_every_handler_action`.
 pub(crate) const HANDLER_ACTIONS: &[&str] = &["exchange8:vfeeds:stream"];

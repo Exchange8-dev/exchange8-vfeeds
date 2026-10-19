@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:VFEEDS service binary — external venue feeds + CBBO + index engine.
+//! Exchange8:VFEEDS service binary - external venue feeds + CBBO + index engine.
 //!
 //! Design: `design/sentin8-exchange8-technical-design.md` (see the
 //! service doc for the exact file). Core logic in the sibling modules;
@@ -26,7 +26,7 @@ fn extend_router(
     app: axum::Router<std::sync::Arc<sentin8::shell::AppState>>,
     _state: std::sync::Arc<sentin8::shell::AppState>,
 ) -> axum::Router<std::sync::Arc<sentin8::shell::AppState>> {
-    // ── Shield (Sentin8:Policy) admin API — shared implementation;
+    // ── Shield (Sentin8:Policy) admin API - shared implementation;
     // the shell AppState already implements HasPolicyAdmin (see DESIGN.md §2).
     sentin8::shell::mount_policy_admin(
         // Feed adapters are dedicated TCP/multicast tasks (design §4.1);

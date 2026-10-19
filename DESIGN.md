@@ -1,4 +1,4 @@
-# Exchange8:VFeeds — Detailed Design Document
+# Exchange8:VFeeds - Detailed Design Document
 
 > Wire-level construction of the external venue feeds service. For the
 > overview read `README.md`; for business functionality read `BUSINESS.md`.
@@ -37,23 +37,23 @@ System context:
 
 ```mermaid
 graph TD
-    subgraph EDGE["External venue networks — untrusted"]
-        V1["TSX / TSXV / Chi-X / Aequitas / CSE — multicast, SOUP, TL1"]
-        V2["Crypto venues — REST + WebSocket"]
+    subgraph EDGE["External venue networks - untrusted"]
+        V1["TSX / TSXV / Chi-X / Aequitas / CSE - multicast, SOUP, TL1"]
+        V2["Crypto venues - REST + WebSocket"]
     end
-    subgraph EX8["exchange8 vertical — database exchange8"]
-        VF["exchange8-vfeeds — schema vfeeds"]
+    subgraph EX8["exchange8 vertical - database exchange8"]
+        VF["exchange8-vfeeds - schema vfeeds"]
         MD["exchange8-md"]
         SOR["exchange8-sor"]
         OMS["exchange8-oms"]
         MARGIN["exchange8-margin"]
-        REF["exchange8-refdata — schema refdata"]
+        REF["exchange8-refdata - schema refdata"]
     end
-    subgraph PLAT["Sentin8 platform — trust boundary"]
-        AUTH["Sentin8:Auth — issuer"]
+    subgraph PLAT["Sentin8 platform - trust boundary"]
+        AUTH["Sentin8:Auth - issuer"]
         BUS["Sentin8:Bus"]
-        SYS["Sentin8:Sys — audit ingest"]
-        POL["Sentin8:Policy — Shield"]
+        SYS["Sentin8:Sys - audit ingest"]
+        POL["Sentin8:Policy - Shield"]
     end
     V1 -- "MulticastAB / SoupTcp / Tcp frames (unauthenticated transport, secret-ref logins)" --> VF
     V2 -- "HTTPS poll + WSS stream" --> VF
@@ -73,24 +73,24 @@ Container view:
 ```mermaid
 graph TD
     subgraph BIN["exchange8-vfeeds binary (sentin8::shell)"]
-        subgraph HTTP["HTTP surface — PQ-TLS terminated in-process"]
+        subgraph HTTP["HTTP surface - PQ-TLS terminated in-process"]
             HL["GET /v1/health"]
-            PA["Shield admin API — mount_policy_admin"]
+            PA["Shield admin API - mount_policy_admin"]
         end
         subgraph DOMAIN["Domain core"]
-            ADPT["adapters.rs — VenueAdapter registry"]
-            SEQ["recovery.rs — AbSequencer"]
-            BBOE["bbo.rs — BboEngine"]
-            IDX["index.rs — IndexEngine"]
-            IV["adapters.rs — IvSurface"]
+            ADPT["adapters.rs - VenueAdapter registry"]
+            SEQ["recovery.rs - AbSequencer"]
+            BBOE["bbo.rs - BboEngine"]
+            IDX["index.rs - IndexEngine"]
+            IV["adapters.rs - IvSurface"]
         end
         subgraph WORKERS["Shell boot workers (fail-open loops)"]
-            RELAYW["outbox relay — sentin8_outbox::spawn_relay"]
-            PUSHW["audit pusher — sentin8_audit::spawn_journal_pusher"]
+            RELAYW["outbox relay - sentin8_outbox::spawn_relay"]
+            PUSHW["audit pusher - sentin8_audit::spawn_journal_pusher"]
             HOTREL["Shield hot-reload consumer (boot_full)"]
         end
     end
-    subgraph PERSIST["database exchange8 — schema vfeeds (RLS forced)"]
+    subgraph PERSIST["database exchange8 - schema vfeeds (RLS forced)"]
         T1["external_feed"]
         T2["external_retrans_feed"]
         T3["previous_day_summary"]
@@ -98,8 +98,8 @@ graph TD
         OBOX["outbox"]
         JRN["audit_journal"]
     end
-    subgraph SVC["Runtime registrations — vertical enroll"]
-        REG["registration.rs — scopes, roles, M2M grants, RFW pages, policy set"]
+    subgraph SVC["Runtime registrations - vertical enroll"]
+        REG["registration.rs - scopes, roles, M2M grants, RFW pages, policy set"]
     end
     HTTP -- "axum Router (extend_router)" --> DOMAIN
     DOMAIN -- "domain change + outbox row (same tx)" --> OBOX
@@ -121,7 +121,7 @@ Components inside the binary:
    live platform table; unparsable text **refuses to start**) → state build →
    router assembly → middleware stack → in-process PQ-TLS accept loop.
 2. **Router extension** (`main.rs::extend_router`): the only route addition is
-   `mount_policy_admin` — the Shield admin API (policy sets, relations,
+   `mount_policy_admin` - the Shield admin API (policy sets, relations,
    attributes, decisions, RFW POST aliases). The shell mounts `/v1/health`
    with the in-flight gauge for the drain signal. The service declares RFW
    pages `feeds` (`/v1/admin/ui/feeds`, data `/v1/admin/feeds`) and `indices`
@@ -138,10 +138,10 @@ Components inside the binary:
 5. **Feed sessions** (ownership contract, `adapters.rs` docs): dedicated
    per-feed tasks own transports, SOUP login/sequenced/heartbeat, multicast
    joins, reconnection and backoff; they feed the A/B sequencer and adapters
-   (spawn site noted in §10). Panics never cross feeds — task isolation keeps
+   (spawn site noted in §10). Panics never cross feeds - task isolation keeps
    other venues streaming.
 
-### Request family — venue feed connect / consume
+### Request family - venue feed connect / consume
 
 ```mermaid
 sequenceDiagram
@@ -158,9 +158,9 @@ sequenceDiagram
     alt seq equal next expected
         Seq-->>Task: ready (in order)
     else seq below next expected
-        Seq-->>Task: stale — dropped (dedup)
+        Seq-->>Task: stale - dropped (dedup)
     else seq above next expected
-        Seq-->>Task: buffered — FeedHealth::Recovering
+        Seq-->>Task: buffered - FeedHealth::Recovering
         Task->>Seq: on_b_wait_timeout() after B-fill window
         Seq-->>Task: RetransmitRequest{from_seq,to_seq,count}
         Task->>Venue: request range from recovery endpoint (external_retrans_feed)
@@ -180,7 +180,7 @@ sequenceDiagram
     end
 ```
 
-### Request family — tick / BBO fan-out to Exchange8:MD
+### Request family - tick / BBO fan-out to Exchange8:MD
 
 ```mermaid
 sequenceDiagram
@@ -200,7 +200,7 @@ sequenceDiagram
     Note over BBO,MD: Relay fail-open: Bus outage leaves rows relayed=false, 5 s poll retries
 ```
 
-### Request family — index computation
+### Request family - index computation
 
 ```mermaid
 sequenceDiagram
@@ -221,7 +221,7 @@ sequenceDiagram
     Note over IDX: rebalance_divisor(new_raw, old_value) keeps the published level continuous on constituent changes
 ```
 
-### Request family — recovery / replay
+### Request family - recovery / replay
 
 ```mermaid
 sequenceDiagram
@@ -233,9 +233,9 @@ sequenceDiagram
 
     A-->>Seq: seq 1 (in order, delivered)
     A-->>Seq: seq 4 (hole 2..3 → buffered)
-    Seq-->>Sink: nothing yet — health = Recovering
+    Seq-->>Sink: nothing yet - health = Recovering
     B-->>Seq: seq 2, seq 3 (B fills the hole)
-    Seq-->>Sink: 2, 3, 4 in order — Healthy
+    Seq-->>Sink: 2, 3, 4 in order - Healthy
     Note over Seq: staleness: B replay of already-delivered seq is dropped
     A-->>Seq: seq 9 (hole 5..8)
     Seq-->>Seq: on_b_wait_timeout → request 5..8
@@ -331,10 +331,10 @@ Per-table notes:
 
 | Table | Ownership / visibility |
 |---|---|
-| `vfeeds.external_feed` | Tenant config. Adapter CHECK constraint is the compile-time registry (`stamp_cbbo`, `stamp_quotes`, `itch_orders`, `xmt`, `soup_tcp`, `mold_udp`, `fix`, `websocket`). `creds_secret_ref` is a Sentin8:Secrets reference — never plaintext. Select/insert/update/delete policies per operation. |
+| `vfeeds.external_feed` | Tenant config. Adapter CHECK constraint is the compile-time registry (`stamp_cbbo`, `stamp_quotes`, `itch_orders`, `xmt`, `soup_tcp`, `mold_udp`, `fix`, `websocket`). `creds_secret_ref` is a Sentin8:Secrets reference - never plaintext. Select/insert/update/delete policies per operation. |
 | `vfeeds.external_retrans_feed` | Per-feed retransmission endpoint (address, port, `timeout_ms` default 5000). FK to the owning feed. |
 | `vfeeds.previous_day_summary` | One row per `(env_id, security_id, trade_date)`: close price, volume, lot policy (`board`/`odd`/`all`). Lot-policy source for gateway lot-size events. |
-| `vfeeds.index` | Index definition: unique name per env; method CHECK (`median`, `volume_weighted`, `time_weighted` — the `IndexMethod` vocabulary the engine implements); divisor default 1.0. |
+| `vfeeds.index` | Index definition: unique name per env; method CHECK (`median`, `volume_weighted`, `time_weighted` - the `IndexMethod` vocabulary the engine implements); divisor default 1.0. |
 | `vfeeds.index_constituent` | Constituent rows `(index_id, security_id, venue_mic)` unique; `weight` default 1.0. Optional per-constituent venue for per-venue constituent indices. |
 | `vfeeds.index_value` | Append-only published history; index `(env_id, index_id, ts)` for range reads. |
 | `vfeeds.outbox` | Generated (`sentin8_outbox::outbox_table_sql("vfeeds")`). `relayed`/`relay_attempts` are relay state; partial index on unrelayed rows; `pg_notify` trigger `vfeeds.vfeeds_notify_outbox()` on insert. |
@@ -439,7 +439,7 @@ sequenceDiagram
 stack (correlation, host context, TLS context, request logging, traffic
 counter, CORS) front every route; inbound bearer tokens verify against the
 Auth issuer (discovery + JWKS behind a shared client). Outbound clients
-present the workload certificate (CERTFREE-4V — `ensure_workload_certificate`
+present the workload certificate (CERTFREE-4V - `ensure_workload_certificate`
 behind `BusClient::for_workload`); a certificate-ensure failure
 degrades only the fail-open relay/pusher paths, never the authorization path.
 
@@ -476,11 +476,11 @@ A Sys outage delays, never drops, audit.
 
 **Graceful drain.** `/v1/health` exposes `active_connections` from the
 traffic counter; captain drains against the gauge during rolling upgrades.
-Feed-session reconnection on upgrade is a new instance's session setup — no
+Feed-session reconnection on upgrade is a new instance's session setup - no
 durable feed state lives in the old process.
 
 **TLS posture.** In-process PQ-TLS termination (`sentin8-tls`); the TLS
-library is database-free — host context resolution rides Sys
+library is database-free - host context resolution rides Sys
 `GET /v1/resolve/hostname` via the `exchange8-vfeeds-tls` workload (scope
 `sentin8:sys:instances:read`) with a TTL cache, no DSN, no platform grants
 (TLS-RLS-4). Never `danger_accept_invalid_certs`; credentials never ride the
@@ -493,7 +493,7 @@ flowchart TD
     GAP["Sequence gap on leg A"] --> BUF["Buffer out-of-order messages (bounded)"]
     BUF --> HEALTH["FeedHealth::Recovering"]
     BUF --> BWAIT{"B leg fills within window?"}
-    BWAIT -- "yes" --> DRAIN["Drain in order — Healthy"]
+    BWAIT -- "yes" --> DRAIN["Drain in order - Healthy"]
     BWAIT -- "no (on_b_wait_timeout)" --> REQ["RetransmitRequest{from_seq, to_seq, count}"]
     REQ --> RETR{"Venue recovery endpoint answers? (external_retrans_feed)"}
     RETR -- "yes" --> FILL["Retransmissions close pending_request → drain → Healthy"]
@@ -541,7 +541,7 @@ Other durable failures:
 - **Adapter panic**: the per-feed task restarts with backoff; sibling feeds
   continue; a `feed:status` event marks the affected feed.
 - **DLQ**: consumer-side trigger failures land in Sentin8:Bus's DLQ after
-  retries for manual replay — never silently dropped.
+  retries for manual replay - never silently dropped.
 
 ## 7. Concurrency & Performance Model
 
@@ -559,9 +559,9 @@ graph LR
     BBO["BboEngine per instrument (Vec VenueQuote + last Bbo)"]
     IDX["IndexEngine per index (method + divisor + last value)"]
     CH["mpsc to domain writer"]
-    PG[("Postgres: vfeeds schema — pool cap = SENTIN8_PG_POOL_MAX (default 3)")]
-    RELAY[("relay task — pg_notify + 5 s poll")]
-    PUSH[("audit pusher — 5 s pass")]
+    PG[("Postgres: vfeeds schema - pool cap = SENTIN8_PG_POOL_MAX (default 3)")]
+    RELAY[("relay task - pg_notify + 5 s poll")]
+    PUSH[("audit pusher - 5 s pass")]
     HOT["Shield hot-reload consumer"]
 
     T1 --> SEQ --> ADPT --> CH
@@ -579,7 +579,7 @@ graph LR
 - **Task layout.** One dedicated task per feed config row (transport I/O,
   heartbeat, reconnect); workers for relay, audit pusher, Shield hot reload;
   the axum accept loop runs under `tls.serve`.
-- **Locking.** Per-instrument engine state is owned by the consuming task —
+- **Locking.** Per-instrument engine state is owned by the consuming task -
   no shared mutex on the quote hot path; cross-task handoff is an mpsc
   hand-off to the single writer that performs transactional domain writes.
 - **Hot paths.** CBBO recompute is a linear scan over a small dense venue
@@ -598,7 +598,7 @@ graph LR
 
 1. `AbSequencer` never delivers out of order: delivery requires
    `seq == next_seq`; buffer drain always preserves ascending sequence.
-2. Stale (`seq < next_seq`) venue messages are dropped — replay from either
+2. Stale (`seq < next_seq`) venue messages are dropped - replay from either
    leg never re-applies delivered state.
 3. `BboEngine` consolidated sides consider only non-empty venue quotes; a
    venue with no quote can never win a best scan.
@@ -620,12 +620,12 @@ graph LR
 **Insecure defaults rejected**
 
 - Dense zero-filled venue arrays with best-scan zero-inclusion (an empty venue
-  could win the "best ask" scan) — replaced by `Option`-based storage.
-- Plaintext credential columns on feed rows — secret references only.
-- `BYPASSRLS` on any service role — rejected platform-wide.
-- Emitting quotes as raw venue payloads to consumers — only the normalized
+  could win the "best ask" scan) - replaced by `Option`-based storage.
+- Plaintext credential columns on feed rows - secret references only.
+- `BYPASSRLS` on any service role - rejected platform-wide.
+- Emitting quotes as raw venue payloads to consumers - only the normalized
   event model crosses the boundary.
-- Startup with unparsable policy sets — refuse-to-start instead of
+- Startup with unparsable policy sets - refuse-to-start instead of
   running unguarded.
 
 **Unsafe rationale.** The crate contains no `unsafe` blocks. PQ-TLS and
@@ -636,25 +636,25 @@ this service.
 
 ```mermaid
 graph TD
-    subgraph UNIT["Unit — in-binary, pure cores"]
-        AD["adapters.rs tests — parser fixtures per venue: ITCH, XMT binary, Aequitas framing incl. truncated, TL1, crypto JSON, unknown-line skip"]
-        BBO2["bbo.rs tests — best/max selection, empty-venue exclusion, unchanged collapse, cross zero + alert, clear bid/both, unknown venue no-op, one-sided quotes, out-of-range venue, wide-cross containment"]
-        IDX2["index.rs tests — median robustness incl. even counts, volume- and time-weighted, divisor scaling, outlier rejection + all-rejected fallback, rebalance continuity, degenerate inputs"]
-        RECOV["recovery.rs tests — in-order delivery, stale dedup, B-fill, timeout request, retransmit close, buffer-cap backstop, order preservation"]
+    subgraph UNIT["Unit - in-binary, pure cores"]
+        AD["adapters.rs tests - parser fixtures per venue: ITCH, XMT binary, Aequitas framing incl. truncated, TL1, crypto JSON, unknown-line skip"]
+        BBO2["bbo.rs tests - best/max selection, empty-venue exclusion, unchanged collapse, cross zero + alert, clear bid/both, unknown venue no-op, one-sided quotes, out-of-range venue, wide-cross containment"]
+        IDX2["index.rs tests - median robustness incl. even counts, volume- and time-weighted, divisor scaling, outlier rejection + all-rejected fallback, rebalance continuity, degenerate inputs"]
+        RECOV["recovery.rs tests - in-order delivery, stale dedup, B-fill, timeout request, retransmit close, buffer-cap backstop, order preservation"]
     end
-    subgraph POLICYTESTS["Policy wiring — tests/policy.rs"]
+    subgraph POLICYTESTS["Policy wiring - tests/policy.rs"]
         PL["Real scope-mirror seed: no-set deny, no-match deny, shadow passthrough, mirror coverage of every handler action, M2M parity, admin scopes, forbid-vs-permit, role-keyed tenant sets, cross-env isolation, enroll dry-run"]
     end
-    subgraph SQLTESTS["SQL integration — tests/sql_matrix.rs (live Postgres, probe role, rolled-back tx)"]
+    subgraph SQLTESTS["SQL integration - tests/sql_matrix.rs (live Postgres, probe role, rolled-back tx)"]
         SQL["Every init.sql table FORCE RLS + select policy (self-maintaining from DDL); no-context zero rows; unauthenticated insert rejected; own-env exactly once; cross-env zero"]
     end
-    REPLAY["Replay corpora — recorded venue captures through the same pure parsers (venue-feeds design §10)"]
+    REPLAY["Replay corpora - recorded venue captures through the same pure parsers (venue-feeds design §10)"]
     UNIT --> REPLAY
     POLICYTESTS --> UNIT
     SQLTESTS --> UNIT
 ```
 
-- **Unit/pure**: every adapter parser, CBBO rules, index math, A/B recovery —
+- **Unit/pure**: every adapter parser, CBBO rules, index math, A/B recovery -
   deterministic, offline (`cargo test` needs no DB; integration tests skip
   silently offline).
 - **Policy wiring**: `tests/policy.rs` loads the *real* seeded policy text via
@@ -664,7 +664,7 @@ graph TD
   non-bypass role and derives its assertions from this service's own
   `init.sql`; all fixture work rides one rolled-back transaction.
 - **Not tested here** (platform level): token issuance/verification, Bus
-  broker internals, captain drain mechanics, cross-service E2E flows — covered
+  broker internals, captain drain mechanics, cross-service E2E flows - covered
   by the platform's testing strategy and sibling services.
 
 ## 10. Open Questions
@@ -684,7 +684,7 @@ graph TD
   wiring.
 - **Index-method vocabulary drift**: the `vfeeds.index.method` CHECK and the
   `IndexMethod` engine enum must stay the same vocabulary (`median`,
-  `volume_weighted`, `time_weighted`) — a schema CHECK naming methods the engine
+  `volume_weighted`, `time_weighted`) - a schema CHECK naming methods the engine
   does not implement would strand any row configured with them. The alignment is
   maintained by the engine's own serialization tests.
 - **Index publication cadence**: tick-driven vs periodic index snapshots, and

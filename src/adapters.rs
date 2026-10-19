@@ -7,7 +7,7 @@
 //! REST/WS feeds + IV surface + index feed.
 //!
 //! - **Adapter framework**: the `VenueAdapter` trait, transport enum,
-//!   payload kinds (see DESIGN.md §4) — the compile-time adapter registry.
+//!   payload kinds (see DESIGN.md §4) - the compile-time adapter registry.
 //! - **`itch_orders`** (Chi-X ITCH-over-Mold/Soup): normalized depth
 //!   events from ITCH add/update/exec messages.
 //! - **`exmt_quantum`** (TSX/TSXV/TMX Select XMT): binary L1 packets

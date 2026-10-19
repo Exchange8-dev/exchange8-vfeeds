@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Vfeeds
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:VFeeds index engine — constituent aggregation + divisor continuity.
+//! Exchange8:VFeeds index engine - constituent aggregation + divisor continuity.
 //!
 //! Methods: median / volume-weighted / time-weighted, with outlier rejection
 //! (drop constituents deviating > N% from the median). The divisor maintains
@@ -323,7 +323,7 @@ mod tests {
 
     #[test]
     fn outlier_all_rejected_falls_back_to_base() {
-        // Degenerate: two constituents 300% apart with a 1% tolerance —
+        // Degenerate: two constituents 300% apart with a 1% tolerance -
         // everything deviates from the median; fallback to the base median.
         let mut e = IndexEngine::new(IndexMethod::Median, 1.0, 100);
         let ticks = vec![t(1, 10_000, 0, 1), t(2, 40_000, 0, 1)];

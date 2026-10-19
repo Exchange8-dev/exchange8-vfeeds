@@ -100,7 +100,7 @@ impl AbSequencer {
         if msg.seq > self.last_seen[fi] {
             self.last_seen[fi] = msg.seq;
         }
-        // Stale (already delivered) — drop.
+        // Stale (already delivered) - drop.
         if msg.seq < self.next_seq {
             return self.health();
         }
@@ -142,7 +142,7 @@ impl AbSequencer {
     /// Open (or re-open) a retransmission request covering the open hole.
     fn open_request(&mut self) -> Option<RetransmitRequest> {
         // The hole is [next_seq, first_buffered - 1] when buffered messages
-        // exist beyond it; otherwise we do not know the far end — use the
+        // exist beyond it; otherwise we do not know the far end - use the
         // highest seen sequence across feeds.
         let to = self
             .buffer
@@ -217,7 +217,7 @@ mod tests {
         let mut s = AbSequencer::new(1, 64);
         s.on_message(msg(FeedId::A, 1));
         s.take_ready();
-        // Duplicate of 1 (B replay) — stale, dropped, no delivery.
+        // Duplicate of 1 (B replay) - stale, dropped, no delivery.
         s.on_message(msg(FeedId::B, 1));
         assert!(s.take_ready().is_empty());
         // Also below next after gap fill.
@@ -287,7 +287,7 @@ mod tests {
         let mut s = AbSequencer::new(1, 4);
         s.on_message(msg(FeedId::A, 1));
         s.take_ready();
-        // Jump far ahead — buffering 5 messages exceeds the cap of 4.
+        // Jump far ahead - buffering 5 messages exceeds the cap of 4.
         s.on_message(msg(FeedId::A, 10));
         s.on_message(msg(FeedId::A, 11));
         s.on_message(msg(FeedId::A, 12));

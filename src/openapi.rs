@@ -55,7 +55,7 @@ async fn health() {}
     components(schemas()),
     security(),
     tags(
-        (name = "vfeeds", description = "Exchange8:Vfeeds — policy admin + health only"),
+        (name = "vfeeds", description = "Exchange8:Vfeeds - policy admin + health only"),
         (name = "policy", description = "Shield policy administration (shared surface)"),
     ),
 )]

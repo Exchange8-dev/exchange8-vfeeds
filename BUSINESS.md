@@ -1,4 +1,4 @@
-# Exchange8:VFeeds — Business Requirements & Functionality
+# Exchange8:VFeeds - Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
 > Exchange8:VFeeds **does for the business**. For architecture read `README.md`;
@@ -10,8 +10,8 @@
   market: every quoted price across every connected venue, normalized and
   consolidated, so trading decisions are made on one truth rather than on
   per-venue snapshots assembled ad hoc.
-- Protect downstream systems from venue-data defects — crossed books, missing
-  messages, stale quotes — by containing and recovering them inside the feed
+- Protect downstream systems from venue-data defects - crossed books, missing
+  messages, stale quotes - by containing and recovering them inside the feed
   service rather than letting them surface in routing, margin, or client
   displays.
 - Provide the dependable index values that margin, funding, and settlement
@@ -60,7 +60,7 @@
 |---|---|
 | Feed onboarding | A venue feed is one configuration row: adapter type, transport, parameters, credential reference, and open/close schedule; enabling and disabling is an administrative decision with immediate effect on sessions. |
 | Credential protection | Venue logins are stored only as secret references; no operator, developer, or database reader can see plaintext credentials. |
-| Multiple transports per venue | A venue may appear with more than one feed type (e.g. consolidated CBBO plus individual L1) — the authoritative consolidated quote path is the one configured as such. |
+| Multiple transports per venue | A venue may appear with more than one feed type (e.g. consolidated CBBO plus individual L1) - the authoritative consolidated quote path is the one configured as such. |
 | Recovery endpoints | Feeds that support venue-side retransmission declare their recovery host/port and timeout with the feed. |
 
 **Consolidated market state**
@@ -69,7 +69,7 @@
 |---|---|
 | CBBO accuracy | The consolidated best bid is the highest non-empty bid across venues; the consolidated best ask is the lowest non-empty ask; empty venues never participate. |
 | Consolidation change discipline | Identical quote updates do not re-publish the CBBO; only genuine consolidated changes emit updates. |
-| Crossed-market rule | When the consolidated best bid exceeds the consolidated best ask, the crossing venue's quote is zeroed, the CBBO is recomputed without it, and an alert is recorded — the crossed state is never published. |
+| Crossed-market rule | When the consolidated best bid exceeds the consolidated best ask, the crossing venue's quote is zeroed, the CBBO is recomputed without it, and an alert is recorded - the crossed state is never published. |
 | Quote hygiene | Operators can clear a stale quote per venue, per side, or both; the CBBO recomputes. |
 | Lot policy | Previous-day close data carries the lot policy (board / odd / all) used by quote and gateway paths for odd-lot handling. |
 
@@ -77,7 +77,7 @@
 
 | Capability | Business rule |
 |---|---|
-| One event model | Every venue's quote — TSX stamps, Chi-X ITCH depth adds/execs, TSX/TSXV binary L1, Aequitas frames, CSE TL1 text, crypto REST/WS payloads — becomes the same normalized event with venue identity and both venue and receive timestamps. |
+| One event model | Every venue's quote - TSX stamps, Chi-X ITCH depth adds/execs, TSX/TSXV binary L1, Aequitas frames, CSE TL1 text, crypto REST/WS payloads - becomes the same normalized event with venue identity and both venue and receive timestamps. |
 | Dual-clock accounting | Venue timestamps and receive timestamps travel together so late or skewed ticks are measurable and orderable. |
 | Per-venue attribution | Every quote and every consolidated side carries the venue it came from. |
 
@@ -96,7 +96,7 @@
 |---|---|
 | Index methods | An index is computed by median (robust by construction), volume-weighted (volume × weight in the window), or time-weighted (configured weights) aggregation. |
 | Outlier protection | When enabled, constituents deviating more than the configured basis-point tolerance from the median are dropped and the aggregate recomputed once so no single distorted constituent steers the index. |
-| Continuity on rebalance | When constituents change, only the divisor is adjusted — the published index level never jumps because of the change. |
+| Continuity on rebalance | When constituents change, only the divisor is adjusted - the published index level never jumps because of the change. |
 | History | Every published index value is retained with its timestamp for audit and settlement. |
 
 ## 4. Business Events (Outbound)
@@ -104,7 +104,7 @@
 | Event | When it fires | Business meaning |
 |---|---|---|
 | `exchange8:vfeeds:venue:quote` | A venue's normalized quote event | A specific venue's price moved |
-| `exchange8:vfeeds:bbo:updated` | The consolidated best bid/offer changed | The cross-venue top of book changed — re-publication and routing refresh |
+| `exchange8:vfeeds:bbo:updated` | The consolidated best bid/offer changed | The cross-venue top of book changed - re-publication and routing refresh |
 | `exchange8:vfeeds:feed:status` | Feed up/down/degraded, sequence gaps | Operations health and staleness handling for that venue |
 | `exchange8:vfeeds:index:updated` | An index computed and published a new value | The reference price for margin/funding/settlement moved |
 
@@ -119,12 +119,12 @@ service's authorization surface) via the platform consumption path.
 3. A repeated identical quote never re-publishes the CBBO.
 4. Venue messages are delivered to pricing state strictly in sequence order;
    delayed or replayed duplicates from either leg are discarded.
-5. An unrecoverable feed gap surfaces as an explicit degraded/gap condition —
+5. An unrecoverable feed gap surfaces as an explicit degraded/gap condition -
    it is never silently papered over.
 6. Index values are only published from a positive divisor and at least one
    usable constituent; outlier rejection keeps single-constituent distortion
    out of the reference price.
-7. The published index level is continuous across constituent-set changes —
+7. The published index level is continuous across constituent-set changes -
    only the divisor moves, not the level.
 8. Close price, volume, and lot policy for a security on a trade date are
    unique per environment and never ambiguous.
@@ -180,7 +180,7 @@ service's authorization surface) via the platform consumption path.
 ## 9. Acceptance Criteria
 
 1. Adding a new venue requires only an adapter implementation and a feed
-   configuration row — no changes to any consuming service.
+   configuration row - no changes to any consuming service.
 2. Given quotes from multiple venues, the published CBBO always equals the
    max-non-empty-bid / min-non-empty-ask with the contributing venue named.
 3. A crossed consolidated book is contained by zeroing and alerting, with the
