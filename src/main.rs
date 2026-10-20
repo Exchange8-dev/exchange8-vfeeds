@@ -18,8 +18,8 @@
 mod adapters;
 mod bbo;
 mod index;
-mod recovery;
 mod openapi;
+mod recovery;
 mod registration;
 
 fn extend_router(
