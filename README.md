@@ -1,8 +1,13 @@
-# README.md: Exchange8:VFeeds - External Venue Feeds, Consolidated BBO, Index Engine
+# Exchange8:VFeeds - External Venue Feeds, Consolidated BBO, Index Engine
 
 > Overview - what Exchange8:VFeeds is, why it exists, and how it fits the exchange8
 > platform. Wire-level detail lives in `DESIGN.md`; business functionality in
 > `BUSINESS.md`.
+
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
+[![Built with Rust](https://img.shields.io/badge/Built%20with-Rust-orange.svg)](https://www.rust-lang.org/)
+[![Docs](https://img.shields.io/badge/docs/read-3aa757.svg)](https://exchange8.dev/docs/products/vfeeds)
+[![Website](https://img.shields.io/badge/website-exchange8.dev-1a73e8.svg)](https://exchange8.dev)
 
 ## 1. Summary
 
