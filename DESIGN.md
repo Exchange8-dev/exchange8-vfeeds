@@ -483,7 +483,7 @@ durable feed state lives in the old process.
 library is database-free - host context resolution rides Sys
 `GET /v1/resolve/hostname` via the `exchange8-vfeeds-tls` workload (scope
 `sentin8:sys:instances:read`) with a TTL cache, no DSN, no platform grants
-(TLS-RLS-4). Never `danger_accept_invalid_certs`; credentials never ride the
+. Never `danger_accept_invalid_certs`; credentials never ride the
 wire in plaintext (secret references at rest, Sentin8:Secrets at fetch).
 
 ## 6. Failure Modes & Recovery
