@@ -169,12 +169,15 @@ const M2M_GRANTS: &[M2mGrant] = &[
 
 const SQL_1_INIT: &str = include_str!("../sql/init.sql");
 
-fn empty_openapi() -> serde_json::Value {
-    serde_json::to_value(crate::openapi::VfeedsOpenApi::openapi())
-        .unwrap_or(serde_json::Value::Null)
-}
 
 pub fn print(section: Option<String>) -> anyhow::Result<()> {
+        // The utoipa dump is a BINARY-crate static (main.rs): the embedded test
+    // harnesses that compose this file cannot see it and never print a spec.
+    #[cfg(not(test))]
+    let dump: fn() -> serde_json::Value = crate::OPENAPI_DUMP;
+    #[cfg(test)]
+    let dump: fn() -> serde_json::Value = || serde_json::Value::Null;
+
     let reg = Registration {
         service_type: "exchange8:vfeeds",
         subdomain: "exchange8-vfeeds",
@@ -199,11 +202,11 @@ pub fn print(section: Option<String>) -> anyhow::Result<()> {
         service_actions: None,
         m2m_grants: Some(M2M_GRANTS),
         openapi_url: "/openapi.json",
-        openapi: empty_openapi,
+        openapi: dump,
         policies: POLICIES,
         relations: RELATIONS,
         event_triggers: &[],
         schedules: &[],
     };
-    sentin8::registration::print_registration(section, &reg, empty_openapi)
+    sentin8::registration::print_registration(section, &reg, dump)
 }
