@@ -8,8 +8,6 @@
 //! Output via `--print-registration` (see the platform
 //! `sentin8-service-self-registration-design.md`).
 
-use utoipa::OpenApi;
-
 use sentin8::registration::{
     AdminScope, AdminUi, AdminUiPage, CrossSchemaGrant, ErrorCode, M2mGrant, PgRole, PolicySetDecl,
     Registration, RelationDecl, SqlMigration,
