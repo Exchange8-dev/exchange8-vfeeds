@@ -6,7 +6,8 @@
       "telemetry_property": {
         "slug": "vfeeds",
         "name": "Exchange8:Vfeeds Telemetry"
-      }
+      },
+      "exposure": "internal"
     }
   ]
 }
